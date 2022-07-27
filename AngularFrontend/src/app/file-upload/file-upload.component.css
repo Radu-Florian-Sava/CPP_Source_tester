@@ -1,0 +1,44 @@
+#container {
+    margin:4px;
+    display: flex;
+    flex-direction:column;
+    justify-content:space-around;
+    width:100%;
+    border: 1px solid black;
+    background-color:aliceblue;
+}
+#serverResponse {
+  margin: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 100%;
+}
+
+#fileUpload,div,#compileBtn,label {
+    margin:4px;
+    padding:2px;
+}
+
+input[type="button"] {
+  position: relative;
+  font-family: calibri;
+  width: 150px;
+  padding: 10px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border: 1px dashed #BBB;
+  text-align: center;
+  background-color: #DDD;
+  cursor: pointer;
+}
+
+
+input[type="button"] {
+    border:1px solid black;
+}
+
+#fileUpload,#compileBtn,#serverResponse,h3,#info {
+    width:100%;
+    text-align:center;
+}
