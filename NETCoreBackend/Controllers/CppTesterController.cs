@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace NETCoreBackend.Controllers
 {
@@ -16,13 +17,14 @@ namespace NETCoreBackend.Controllers
         private static string outputTemplate;
         private static int correctCounter = 0;
         private static int compileCounter = 0;
+        private static IConfigurationSection configurationPaths = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build()
+            .GetSection("LocalPaths");
 
         public CppTesterController(ILogger<CppTesterController> logger, IWebHostEnvironment webHostEnvironment)
         {
             _logger = logger;
             _webHostEnvironment = webHostEnvironment;
         }
-
 
         [HttpPost]
         [Route("postText")]
@@ -95,8 +97,8 @@ namespace NETCoreBackend.Controllers
             {
                 if (sw.BaseStream.CanWrite)
                 {
-                    sw.WriteLine("cd C:\\Users\\Radu\\source\\repos\\CppTester\\NETCoreBackend\\UploadedFiles\\");
-                    sw.WriteLine("g++.exe " + cppSourceName + " -o " + exeName);
+                    sw.WriteLine("cd " + configurationPaths["UploadPath"]);
+                    sw.WriteLine(configurationPaths["CompilerPath"] + cppSourceName + " -o " + exeName);
                     sw.WriteLine(exeName + " " + inputFileName + " " + outputFileName);
                 }
             }
@@ -116,8 +118,8 @@ namespace NETCoreBackend.Controllers
         {
             Process process = new Process();
             var processInfo = new ProcessStartInfo();
-            processInfo.WorkingDirectory = @"C:\WINDOWS\system32";
-            processInfo.FileName = @"C:\WINDOWS\system32\cmd.exe";
+            processInfo.WorkingDirectory = configurationPaths["WorkingDirectoryPath"];
+            processInfo.FileName = configurationPaths["CmdPath"];
             processInfo.Verb = "runas";
             processInfo.UseShellExecute = false;
             processInfo.RedirectStandardInput = true;
