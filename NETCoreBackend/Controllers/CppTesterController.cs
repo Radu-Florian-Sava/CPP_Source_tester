@@ -5,15 +5,11 @@ using System.Text.Json;
 namespace NETCoreBackend.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    [Route("cpptester")]
+    public class CppTesterController : ControllerBase
     {
-        private static readonly string[] Summaries = new[]
-        {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<CppTesterController> _logger;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private static string? inputFileName;
         private static string? cppSourceName;
@@ -21,24 +17,12 @@ namespace NETCoreBackend.Controllers
         private static int correctCounter = 0;
         private static int compileCounter = 0;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger, IWebHostEnvironment webHostEnvironment)
+        public CppTesterController(ILogger<CppTesterController> logger, IWebHostEnvironment webHostEnvironment)
         {
             _logger = logger;
             _webHostEnvironment = webHostEnvironment;
         }
 
-        [HttpGet]
-        [Route("Get")]
-        public IEnumerable<WeatherForecast> Get()
-        {
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-            })
-            .ToArray();
-        }
 
         [HttpPost]
         [Route("postText")]

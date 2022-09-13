@@ -1,4 +1,4 @@
-#container {
+.container {
     margin:4px;
     display: flex;
     flex-direction:column;
@@ -15,14 +15,14 @@
   width: 100%;
 }
 
-#fileUpload,div,#compileBtn,label {
+.fileUpload,div,#compileBtn,label {
     margin:4px;
     padding:2px;
 }
 
 input[type="button"] {
   position: relative;
-  font-family: calibri;
+  font-family: calibri, serif;
   width: 150px;
   padding: 10px;
   -webkit-border-radius: 5px;
@@ -38,7 +38,7 @@ input[type="button"] {
     border:1px solid black;
 }
 
-#fileUpload,#compileBtn,#serverResponse,h3,#info {
+.fileUpload,#compileBtn,#serverResponse,h3,#info {
     width:100%;
     text-align:center;
 }

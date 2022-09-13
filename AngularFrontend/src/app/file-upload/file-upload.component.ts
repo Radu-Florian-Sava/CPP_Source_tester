@@ -53,17 +53,17 @@ export class FileUploadComponent implements OnInit {
       this.inputName = this.selectedFile.name;
       this.allFilesLoaded = true;
     }
-      
+
     if (this.selectedFile.name.includes("output")) {
       this.outputDisplay = "none";
       this.inputDisplay = "block";
       this.cppDisplay = "block";
       this.outputName = this.selectedFile.name;
     }
-      
+
     const fileData = new FormData();
     fileData.append('file', this.selectedFile, this.selectedFile.name);
-    this.http.post('/weatherforecast/postFile', fileData)
+    this.http.post('/cpptester/postFile', fileData)
       .subscribe((res) => {
         var newLabel = document.createElement("label");
         var parentDiv = document.getElementById("serverResponse");
@@ -79,11 +79,11 @@ export class FileUploadComponent implements OnInit {
     var parentDiv = document.getElementById("serverResponse");
     newLabel.innerHTML = "testing " + this.cppName + " with the following arguments: " + this.inputName + " " + this.outputName;
     parentDiv?.appendChild(newLabel);
-    
+
     const options = {
       headers: new HttpHeaders().append('Content-type', 'application/json')
     }
-    this.http.post<string>('/weatherforecast/postRunCMD', JSON.stringify("run"), options)
+    this.http.post<string>('/cpptester/postRunCMD', JSON.stringify("run"), options)
       .subscribe((res) => {
         var newLabel = document.createElement("label");
         var parentDiv = document.getElementById("serverResponse");

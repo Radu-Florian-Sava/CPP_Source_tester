@@ -1,24 +1,24 @@
 <h3>Cpp source test page</h3>
 <br />
-<div id="container">
-  <div id="fileUpload" style="display: {{outputDisplay }}">
+<div class="container">
+  <div class="fileUpload" style="display: {{outputDisplay }}">
     <label>{{selectOutputMessage}}</label>
     <input type="file" (change)="onFileSelected($event)" />
     <input type="button" value="Upload output template" (click)="onUpload()" />
   </div>
-  <div id="fileUpload" style="display:{{cppDisplay}}">
+  <div class="fileUpload" style="display: {{ cppDisplay }} ">
     <label>{{selectCppMessage}}</label>
     <input type="file" (change)="onFileSelected($event)" />
     <input type="button" value="Upload source" (click)="onUpload()" />
   </div>
-  <div id="fileUpload" style="display: {{inputDisplay }}">
+  <div class="fileUpload" style="display: {{inputDisplay }}">
     <label>{{selectInputMessage}}</label>
     <input type="file" (change)="onFileSelected($event)" />
     <input type="button" value="Upload input" (click)="onUpload()" />
   </div>
 </div>
-<div id="container">
-  
+<div class="container">
+
   <div id="serverResponse">Responses from server</div>
   <div id="compileBtn">
     <input type="button" value="Compile and run" (click)="runCMD()" />
