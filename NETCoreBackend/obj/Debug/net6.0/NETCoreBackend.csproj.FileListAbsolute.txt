@@ -27,3 +27,33 @@ C:\Users\Girjoaba Constantin\source\repos\AngularFrontend\NETCoreBackend\obj\Deb
 C:\Users\Girjoaba Constantin\source\repos\AngularFrontend\NETCoreBackend\obj\Debug\net6.0\ref\NETCoreBackend.dll
 C:\Users\Girjoaba Constantin\source\repos\AngularFrontend\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.Properties.Resources.resources
 C:\Users\Girjoaba Constantin\source\repos\AngularFrontend\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.csproj.GenerateResource.cache
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\bin\Debug\net6.0\appsettings.Development.json
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\bin\Debug\net6.0\appsettings.json
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\bin\Debug\net6.0\NETCoreBackend.exe
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\bin\Debug\net6.0\NETCoreBackend.deps.json
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\bin\Debug\net6.0\NETCoreBackend.runtimeconfig.json
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\bin\Debug\net6.0\NETCoreBackend.dll
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\bin\Debug\net6.0\NETCoreBackend.pdb
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\bin\Debug\net6.0\Microsoft.OpenApi.dll
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\bin\Debug\net6.0\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerUI.dll
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.csproj.AssemblyReference.cache
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.Properties.Resources.resources
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.csproj.GenerateResource.cache
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.AssemblyInfoInputs.cache
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.AssemblyInfo.cs
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.csproj.CoreCompileInputs.cache
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\staticwebassets.build.json
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\staticwebassets.development.json
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\scopedcss\bundle\NETCoreBackend.styles.css
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.csproj.CopyComplete
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.dll
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\refint\NETCoreBackend.dll
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.pdb
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\NETCoreBackend.genruntimeconfig.cache
+C:\Users\Radu\Source\Repos\CppTester\NETCoreBackend\obj\Debug\net6.0\ref\NETCoreBackend.dll
+C:\Users\Radu\source\repos\CppTester\NETCoreBackend\bin\Debug\net6.0\CppProperties.json

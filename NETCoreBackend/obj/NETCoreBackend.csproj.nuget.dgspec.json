@@ -1,24 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Girjoaba Constantin\\source\\repos\\AngularFrontend\\NETCoreBackend\\NETCoreBackend.csproj": {}
+    "C:\\Users\\Radu\\source\\repos\\CppTester\\NETCoreBackend\\NETCoreBackend.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Girjoaba Constantin\\source\\repos\\AngularFrontend\\NETCoreBackend\\NETCoreBackend.csproj": {
+    "C:\\Users\\Radu\\source\\repos\\CppTester\\NETCoreBackend\\NETCoreBackend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Girjoaba Constantin\\source\\repos\\AngularFrontend\\NETCoreBackend\\NETCoreBackend.csproj",
+        "projectUniqueName": "C:\\Users\\Radu\\source\\repos\\CppTester\\NETCoreBackend\\NETCoreBackend.csproj",
         "projectName": "NETCoreBackend",
-        "projectPath": "C:\\Users\\Girjoaba Constantin\\source\\repos\\AngularFrontend\\NETCoreBackend\\NETCoreBackend.csproj",
-        "packagesPath": "C:\\Users\\Girjoaba Constantin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Girjoaba Constantin\\source\\repos\\AngularFrontend\\NETCoreBackend\\obj\\",
+        "projectPath": "C:\\Users\\Radu\\source\\repos\\CppTester\\NETCoreBackend\\NETCoreBackend.csproj",
+        "packagesPath": "C:\\Users\\Radu\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Radu\\source\\repos\\CppTester\\NETCoreBackend\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\Girjoaba Constantin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+          "C:\\Users\\Radu\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -67,7 +63,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.200\\RuntimeIdentifierGraph.json"
         }
       }
     }

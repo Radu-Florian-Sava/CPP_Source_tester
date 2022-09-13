@@ -111,8 +111,8 @@ namespace NETCoreBackend.Controllers
             {
                 if (sw.BaseStream.CanWrite)
                 {
-                    sw.WriteLine("cd C:\\Users\\Girjoaba Constantin\\source\\repos\\AngularFrontend\\NETCoreBackend\\UploadedFiles\\");
-                    sw.WriteLine("g++ " + cppSourceName + " -o " + exeName);
+                    sw.WriteLine("cd C:\\Users\\Radu\\source\\repos\\CppTester\\NETCoreBackend\\UploadedFiles\\");
+                    sw.WriteLine("g++.exe " + cppSourceName + " -o " + exeName);
                     sw.WriteLine(exeName + " " + inputFileName + " " + outputFileName);
                 }
             }
@@ -132,8 +132,8 @@ namespace NETCoreBackend.Controllers
         {
             Process process = new Process();
             var processInfo = new ProcessStartInfo();
-            processInfo.WorkingDirectory = @"C:\Windows\System32";
-            processInfo.FileName = @"C:\Windows\System32\cmd.exe";
+            processInfo.WorkingDirectory = @"C:\WINDOWS\system32";
+            processInfo.FileName = @"C:\WINDOWS\system32\cmd.exe";
             processInfo.Verb = "runas";
             processInfo.UseShellExecute = false;
             processInfo.RedirectStandardInput = true;
