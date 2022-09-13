@@ -27,13 +27,6 @@ namespace NETCoreBackend.Controllers
         }
 
         [HttpPost]
-        [Route("postText")]
-        public void Post([FromBody] string sentText)
-        {
-            Console.WriteLine(sentText);
-        }
-
-        [HttpPost]
         [Route("postFile")]
         public IActionResult PostFile(IFormFile file)
         {
