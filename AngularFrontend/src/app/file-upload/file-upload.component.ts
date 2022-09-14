@@ -93,18 +93,18 @@ export class FileUploadComponent implements OnInit {
   }
   runCMD() {
     this.outputDisplay = "none";
-    var newLabel = document.createElement("label");
-    var parentDiv = document.getElementById("serverResponse");
+    const newLabel = document.createElement("label");
+    const parentDiv = document.getElementById("serverResponse");
     newLabel.innerHTML = "testing " + this.cppName + " with the following arguments: " + this.inputName + " " + this.outputName;
     parentDiv?.appendChild(newLabel);
 
     const options = {
       headers: new HttpHeaders().append('Content-type', 'application/json')
     }
-    this.http.post<string>('/cpptester/postRunCMD', JSON.stringify("run"), options)
+    this.http.get<string>('/cpptester/getRunCMD', options)
       .subscribe((res) => {
-        var newLabel = document.createElement("label");
-        var parentDiv = document.getElementById("serverResponse");
+        const newLabel = document.createElement("label");
+        const parentDiv = document.getElementById("serverResponse");
         console.log(res);
         this.response = JSON.stringify(res);
         newLabel.innerHTML = this.response;

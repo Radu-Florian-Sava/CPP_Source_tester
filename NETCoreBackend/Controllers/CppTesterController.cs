@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Text.Json;
-using Microsoft.Extensions.Configuration;
+using System.Security.Cryptography;
+using NETCoreBackend.Utility;
 
 namespace NETCoreBackend.Controllers
 {
@@ -30,9 +31,8 @@ namespace NETCoreBackend.Controllers
         [Route("postSource")]
         public IActionResult PostSource(IFormFile file)
         {
-            Console.WriteLine("Loaded source file: " + file.Name);
-            string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");
-            string filePath = Path.Combine(directoryPath, file.FileName);
+            Console.WriteLine("Loaded source file: " + file.FileName);
+            string filePath = Path.Combine(configurationPaths["UploadPath"], file.FileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
@@ -49,9 +49,8 @@ namespace NETCoreBackend.Controllers
         [Route("postInput")]
         public IActionResult PostInput(IFormFile file)
         {
-            Console.WriteLine("Loaded input file: " + file.Name);
-            string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");
-            string filePath = Path.Combine(directoryPath, file.FileName);
+            Console.WriteLine("Loaded input file: " + file.FileName);
+            string filePath = Path.Combine(configurationPaths["UploadPath"], file.FileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
@@ -65,9 +64,8 @@ namespace NETCoreBackend.Controllers
         [Route("postOutput")]
         public IActionResult PostOutput(IFormFile file)
         {
-            Console.WriteLine("Loaded output file: " + file.Name);
-            string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");
-            string filePath = Path.Combine(directoryPath, file.FileName);
+            Console.WriteLine("Loaded output file: " + file.FileName);
+            string filePath = Path.Combine(configurationPaths["UploadPath"], file.FileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
@@ -77,57 +75,15 @@ namespace NETCoreBackend.Controllers
             return Ok(JsonSerializer.Serialize("Output template uploaded"));
         }
 
-        //[HttpPost]
-        //[Route("postFile")]
-        //public IActionResult PostFile(IFormFile file)
-        //{
-        //    Console.WriteLine("field " + file.Name + " = " + file.FileName);
-
-        //    string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");            
-        //    string filePath = Path.Combine(directoryPath, file.FileName);
-
-        //    if (file.FileName.Split('.')[1] == "cpp")
-        //    {
-        //        using (var stream = new FileStream(filePath, FileMode.Create))
-        //        {
-        //            file.CopyTo(stream);
-        //        }
-        //        cppSourceName = file.FileName;
-        //        correctCounter = 0;
-        //        compileCounter = 0;
-        //        return Ok(JsonSerializer.Serialize("Cpp source uploaded"));
-        //    }
-        //    if (file.FileName.ToLower().Contains("input"))
-        //    {
-        //        using (var stream = new FileStream(filePath, FileMode.Create))
-        //        {
-        //            file.CopyTo(stream);
-        //        }
-        //        inputFileName = file.FileName;
-        //        return Ok(JsonSerializer.Serialize("Input file uploaded"));
-        //    }
-        //    if(file.FileName.ToLower().Contains("output"))
-        //    {
-        //        using (var stream = new FileStream(filePath, FileMode.Create))
-        //        {
-        //            file.CopyTo(stream);
-        //        }
-        //        outputTemplate = file.FileName;
-        //        return Ok(JsonSerializer.Serialize("Output template uploaded"));
-        //    }
-
-        //    return Ok(JsonSerializer.Serialize("Enter valid files"));
-        //}
-
-        [HttpPost]
-        [Route("postRunCMD")]
-        public IActionResult PostRun()
+        [HttpGet]
+        [Route("getRunCMD")]
+        public IActionResult GetRun()
         {
             if (inputFileName != null && cppSourceName != null && outputTemplate != null) 
             {
                 return runCpp();
             }
-            return Ok(JsonSerializer.Serialize("Enter files before compiling"));
+            return BadRequest(JsonSerializer.Serialize("Enter files before compiling"));
         }
 
         public IActionResult runCpp() 
@@ -147,15 +103,18 @@ namespace NETCoreBackend.Controllers
                 }
             }
             process.WaitForExit();
+
             compileCounter++;
 
-            if (compareOutput(outputFileName,outputTemplate))
+            if (compareOutput(outputFileName, outputTemplate))
             {
                 correctCounter++;
                 return Ok(JsonSerializer.Serialize("output for " + cppSourceName + " is correct " + correctCounter + "/" + compileCounter));
-            }               
-            else 
-                return Ok(JsonSerializer.Serialize("output for " + cppSourceName + " is not correct " + correctCounter + "/" + compileCounter));            
+            }
+            else
+            {
+                return Ok(JsonSerializer.Serialize("output for " + cppSourceName + " is not correct " + correctCounter + "/" + compileCounter));
+            }
         }
 
         public Process processStartup()
@@ -179,37 +138,15 @@ namespace NETCoreBackend.Controllers
             return process;
         }
 
-        public bool compareOutput(string file1, string file2)//compar outputFileName cu outputTemplate
+        public bool compareOutput(string computedOutput, string actualOutput)//compar outputFileName cu outputTemplate
         {
-            string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");
-            string file1Path = Path.Combine(directoryPath, file1);
-            string file2Path = Path.Combine(directoryPath, file2);
-            int file1byte;
-            int file2byte;
-            if (file1 == file2)
-                return true;
 
-            FileStream fs1 = new FileStream(file1Path, FileMode.Open);
-            FileStream fs2 = new FileStream(file2Path, FileMode.Open);
+            string computedOutputFilePath = Path.Combine(configurationPaths["UploadPath"], computedOutput);
+            string actualOutputFilePath = Path.Combine(configurationPaths["UploadPath"], actualOutput);
 
-            if(fs1.Length!= fs2.Length)
-            {
-                fs1.Close();
-                fs2.Close();
-                return false;
-            }
+            Console.WriteLine("IT COMPUTES THE CHECKSUMS, NO OTHER COMPARISON NEEDED");
+            return CheckSum.SHA256CheckSum(computedOutputFilePath) == CheckSum.SHA256CheckSum(actualOutputFilePath);
 
-            do
-            {
-                file1byte = fs1.ReadByte();
-                file2byte = fs2.ReadByte();
-            }
-            while ((file1byte == file2byte) && (file1byte != -1) && (file2byte != -1));
-
-            fs1.Close();
-            fs2.Close();
-
-            return ((file1byte - file2byte) == 0);
         }
     }
 }
