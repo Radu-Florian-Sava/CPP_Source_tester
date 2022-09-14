@@ -10,16 +10,13 @@ export class FileUploadComponent implements OnInit {
 
   selectedFile: File | any = null;
   response: string;
-  outputDisplay: String;
-  inputDisplay: String;
-  selectInputMessage: String;
-  selectOutputMessage: String;
-  selectCppMessage: String;
-  cppName: String;
-  inputName: String;
-  outputName: String;
+  outputDisplay: string;
+  inputDisplay: string;
+  cppName: string;
+  inputName: string;
+  outputName: string;
   allFilesLoaded: boolean = false;
-  cppDisplay: String;
+  cppDisplay: string;
 
 
   constructor(private http: HttpClient) {
@@ -30,28 +27,49 @@ export class FileUploadComponent implements OnInit {
     this.outputDisplay = "block";
     this.cppDisplay = "none";
     this.inputDisplay = "none";
-    this.selectCppMessage = "Select cpp source";
-    this.selectInputMessage = "Select input file";
-    this.selectOutputMessage = "Select output template";
     }
 
   ngOnInit(): void {
   }
 
-  onFileSelected(event: any) {
+  onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
     console.log(this.selectedFile);
   }
 
-  onUpload() {
+  onUpload(): void {
     if (this.selectedFile.name.includes(".cpp")) {
       this.allFilesLoaded = false;
       this.inputDisplay = "block";
       this.cppName = this.selectedFile.name;
+
+      const fileData = new FormData();
+      fileData.append('file', this.selectedFile, this.selectedFile.name);
+      this.http.post('/cpptester/postSource', fileData)
+        .subscribe((res) => {
+          const newLabel = document.createElement("label");
+          const parentDiv = document.getElementById("serverResponse");
+          console.log(res);
+          this.response = JSON.stringify(res);
+          newLabel.innerHTML = this.response;
+          parentDiv?.appendChild(newLabel);
+        });
     }
     if (this.selectedFile.name.includes("input")) {
       this.inputName = this.selectedFile.name;
       this.allFilesLoaded = true;
+
+      const fileData = new FormData();
+      fileData.append('file', this.selectedFile, this.selectedFile.name);
+      this.http.post('/cpptester/postInput', fileData)
+        .subscribe((res) => {
+          const newLabel = document.createElement("label");
+          const parentDiv = document.getElementById("serverResponse");
+          console.log(res);
+          this.response = JSON.stringify(res);
+          newLabel.innerHTML = this.response;
+          parentDiv?.appendChild(newLabel);
+        });
     }
 
     if (this.selectedFile.name.includes("output")) {
@@ -59,19 +77,19 @@ export class FileUploadComponent implements OnInit {
       this.inputDisplay = "block";
       this.cppDisplay = "block";
       this.outputName = this.selectedFile.name;
-    }
 
-    const fileData = new FormData();
-    fileData.append('file', this.selectedFile, this.selectedFile.name);
-    this.http.post('/cpptester/postFile', fileData)
-      .subscribe((res) => {
-        var newLabel = document.createElement("label");
-        var parentDiv = document.getElementById("serverResponse");
-        console.log(res);
-        this.response = JSON.stringify(res);
-        newLabel.innerHTML = this.response;
-        parentDiv?.appendChild(newLabel);
-      });
+      const fileData = new FormData();
+      fileData.append('file', this.selectedFile, this.selectedFile.name);
+      this.http.post('/cpptester/postOutput', fileData)
+        .subscribe((res) => {
+          const newLabel = document.createElement("label");
+          const parentDiv = document.getElementById("serverResponse");
+          console.log(res);
+          this.response = JSON.stringify(res);
+          newLabel.innerHTML = this.response;
+          parentDiv?.appendChild(newLabel);
+        });
+    }
   }
   runCMD() {
     this.outputDisplay = "none";
@@ -92,8 +110,6 @@ export class FileUploadComponent implements OnInit {
         newLabel.innerHTML = this.response;
         parentDiv?.appendChild(newLabel);
       });
-    this.selectCppMessage = "Select new cpp";
-    this.selectInputMessage = "Select other input file";
   }
 
 }

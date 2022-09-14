@@ -27,46 +27,97 @@ namespace NETCoreBackend.Controllers
         }
 
         [HttpPost]
-        [Route("postFile")]
-        public IActionResult PostFile(IFormFile file)
+        [Route("postSource")]
+        public IActionResult PostSource(IFormFile file)
         {
-            Console.WriteLine("field " + file.Name + " = " + file.FileName);
-
-            string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");            
+            Console.WriteLine("Loaded source file: " + file.Name);
+            string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");
             string filePath = Path.Combine(directoryPath, file.FileName);
 
-            if (file.FileName.Split('.')[1] == "cpp")
+            using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    file.CopyTo(stream);
-                }
-                cppSourceName = file.FileName;
-                correctCounter = 0;
-                compileCounter = 0;
-                return Ok(JsonSerializer.Serialize("Cpp source uploaded"));
-            }
-            if (file.FileName.ToLower().Contains("input"))
-            {
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    file.CopyTo(stream);
-                }
-                inputFileName = file.FileName;
-                return Ok(JsonSerializer.Serialize("Input file uploaded"));
-            }
-            if(file.FileName.ToLower().Contains("output"))
-            {
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    file.CopyTo(stream);
-                }
-                outputTemplate = file.FileName;
-                return Ok(JsonSerializer.Serialize("Output template uploaded"));
+                file.CopyTo(stream);
             }
 
-            return Ok(JsonSerializer.Serialize("Enter valid files"));
+            cppSourceName = file.FileName;
+            correctCounter = 0;
+            compileCounter = 0;
+            return Ok(JsonSerializer.Serialize("Cpp source uploaded"));
+        } 
+
+        [HttpPost]
+        [Route("postInput")]
+        public IActionResult PostInput(IFormFile file)
+        {
+            Console.WriteLine("Loaded input file: " + file.Name);
+            string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");
+            string filePath = Path.Combine(directoryPath, file.FileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                file.CopyTo(stream);
+            }
+            inputFileName = file.FileName;
+            return Ok(JsonSerializer.Serialize("Input file uploaded"));
         }
+
+        [HttpPost]
+        [Route("postOutput")]
+        public IActionResult PostOutput(IFormFile file)
+        {
+            Console.WriteLine("Loaded output file: " + file.Name);
+            string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");
+            string filePath = Path.Combine(directoryPath, file.FileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                file.CopyTo(stream);
+            }
+            outputTemplate = file.FileName;
+            return Ok(JsonSerializer.Serialize("Output template uploaded"));
+        }
+
+        //[HttpPost]
+        //[Route("postFile")]
+        //public IActionResult PostFile(IFormFile file)
+        //{
+        //    Console.WriteLine("field " + file.Name + " = " + file.FileName);
+
+        //    string directoryPath = Path.Combine(_webHostEnvironment.ContentRootPath, "UploadedFiles");            
+        //    string filePath = Path.Combine(directoryPath, file.FileName);
+
+        //    if (file.FileName.Split('.')[1] == "cpp")
+        //    {
+        //        using (var stream = new FileStream(filePath, FileMode.Create))
+        //        {
+        //            file.CopyTo(stream);
+        //        }
+        //        cppSourceName = file.FileName;
+        //        correctCounter = 0;
+        //        compileCounter = 0;
+        //        return Ok(JsonSerializer.Serialize("Cpp source uploaded"));
+        //    }
+        //    if (file.FileName.ToLower().Contains("input"))
+        //    {
+        //        using (var stream = new FileStream(filePath, FileMode.Create))
+        //        {
+        //            file.CopyTo(stream);
+        //        }
+        //        inputFileName = file.FileName;
+        //        return Ok(JsonSerializer.Serialize("Input file uploaded"));
+        //    }
+        //    if(file.FileName.ToLower().Contains("output"))
+        //    {
+        //        using (var stream = new FileStream(filePath, FileMode.Create))
+        //        {
+        //            file.CopyTo(stream);
+        //        }
+        //        outputTemplate = file.FileName;
+        //        return Ok(JsonSerializer.Serialize("Output template uploaded"));
+        //    }
+
+        //    return Ok(JsonSerializer.Serialize("Enter valid files"));
+        //}
 
         [HttpPost]
         [Route("postRunCMD")]
