@@ -102,9 +102,15 @@ namespace NETCoreBackend.Controllers
                     sw.WriteLine(exeName + " " + inputFileName + " " + outputFileName);
                 }
             }
+
             process.WaitForExit();
 
             compileCounter++;
+
+            if(process.ExitCode != 0)
+            {
+                return BadRequest(JsonSerializer.Serialize("Code could not be compiled due to errors"));
+            }
 
             if (compareOutput(outputFileName, outputTemplate))
             {
@@ -144,7 +150,6 @@ namespace NETCoreBackend.Controllers
             string computedOutputFilePath = Path.Combine(configurationPaths["UploadPath"], computedOutput);
             string actualOutputFilePath = Path.Combine(configurationPaths["UploadPath"], actualOutput);
 
-            Console.WriteLine("IT COMPUTES THE CHECKSUMS, NO OTHER COMPARISON NEEDED");
             return CheckSum.SHA256CheckSum(computedOutputFilePath) == CheckSum.SHA256CheckSum(actualOutputFilePath);
 
         }

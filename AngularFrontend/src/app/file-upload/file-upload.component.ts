@@ -6,6 +6,7 @@ import { Component, OnInit } from '@angular/core';
   templateUrl: './file-upload.component.html',
   styleUrls: ['./file-upload.component.css']
 })
+
 export class FileUploadComponent implements OnInit {
 
   selectedFile: File | any = null;
@@ -30,6 +31,7 @@ export class FileUploadComponent implements OnInit {
     }
 
   ngOnInit(): void {
+
   }
 
   onFileSelected(event: any): void {
