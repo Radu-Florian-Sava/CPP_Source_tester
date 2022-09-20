@@ -13,21 +13,47 @@ namespace NETCoreBackend.Controllers
         private readonly ILogger<CppTesterController> _logger;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfigurationSection _configurationPaths;
+        private readonly IConfigurationSection _credentials;
         private static string? _inputFileName;
         private static string? _cppSourceName;
         private static string? _outputTemplate;
         private static int _correctCounter = 0;
         private static int _compileCounter = 0;
+        private static string? _token = null;
 
         public CppTesterController(ILogger<CppTesterController> logger, IWebHostEnvironment webHostEnvironment)
         {
             _logger = logger;
             _webHostEnvironment = webHostEnvironment;
             _configurationPaths = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("LocalPaths");
+            _credentials = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("AdminCredentials");
             //_inputFileName = "input" + _uniqueIdentifier + ".txt";
             //_outputTemplate = "expected_output" + _uniqueIdentifier + ".txt";
             //_cppSourceName = "source" + _uniqueIdentifier + ".cpp";
             //_cppSourceName = "source" + _uniqueIdentifier + ".cpp";
+        }
+
+        [HttpPost]
+        [Route("postCredentials")]
+        public IActionResult PostCredentials([FromBody] Credentials credentials )
+        {
+            string? username = credentials.username;
+            string? password = credentials.password;
+
+            if(_token == null)
+            {
+                if (username == _credentials["Username"] && password == _credentials["PasswordHash"])
+                {
+                    _token = TokenGenerator.GenerateToken(10);
+                    Console.WriteLine("Token:{0}", _token);
+                    return Ok(JsonSerializer.Serialize(_token));
+                }
+                else
+                {
+                    return BadRequest(JsonSerializer.Serialize("Credentials are not correct"));
+                }
+            }
+            return Ok("Already logged in");
         }
 
         [HttpPost]
@@ -56,7 +82,14 @@ namespace NETCoreBackend.Controllers
         [Route("postInput")]
         public IActionResult PostInput(IFormFile file)
         {
-            _inputFileName = file.FileName;
+            Console.WriteLine("Input file name is {0}", file.FileName);
+
+            if (file.FileName != _token)
+            {
+                return Ok(JsonSerializer.Serialize("Invalid credentials"));
+            }
+
+            _inputFileName =  "input" + file.FileName + ".txt";
 
             string filePath = Path.Combine(_configurationPaths["UploadPath"], _inputFileName);
 
@@ -74,7 +107,13 @@ namespace NETCoreBackend.Controllers
         [Route("postOutput")]
         public IActionResult PostOutput(IFormFile file)
         {
-            _outputTemplate = file.FileName;
+            Console.WriteLine("Output file name is {0}", file.FileName);
+            if (file.FileName != _token)
+            {
+                return Ok(JsonSerializer.Serialize("Invalid credentials"));
+            }
+
+            _outputTemplate = "output" + file.FileName + ".txt";
 
             string filePath = Path.Combine(_configurationPaths["UploadPath"], _outputTemplate);
 

@@ -19,15 +19,18 @@
     "@angular/platform-browser": "^14.0.0",
     "@angular/platform-browser-dynamic": "^14.0.0",
     "@angular/router": "^14.0.0",
+    "crypto-js": "^4.1.1",
+    "cryptojs": "^2.5.3",
+    "jest-editor-support": "*",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",
-    "zone.js": "~0.11.4",
-    "jest-editor-support": "*"
+    "zone.js": "~0.11.4"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^14.0.5",
     "@angular/cli": "~14.0.5",
     "@angular/compiler-cli": "^14.0.0",
+    "@types/crypto-js": "^4.1.1",
     "@types/jasmine": "~4.0.0",
     "jasmine-core": "~4.1.0",
     "karma": "~6.3.0",

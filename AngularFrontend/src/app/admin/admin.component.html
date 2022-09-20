@@ -3,6 +3,7 @@
   <form #userForm="ngForm" novalidate>
 
     <div class="form-group">
+      {{this.token ? this.token : this.username + " " + this.password}}
       <label>Input file</label>
       <input type="file" required #inputFileModel="ngModel" class="form-control" name="inputFile" [(ngModel)]="inputFile"
              [class.is-invalid]="inputFileModel.invalid && inputFileModel.touched" (change)="selectInputFile($event)">
@@ -17,6 +18,22 @@
 
       <div *ngIf="outputFileModel.errors && (outputFileModel.invalid || outputFileModel.touched)">
         <small class="text-danger" *ngIf="outputFileModel.errors?.['required']">Output file is required</small>
+      </div>
+
+      <label>Username</label>
+      <input type="text" required #usernameModel="ngModel" class="form-control" name="username" [(ngModel)]="username"
+             [class.is-invalid]="usernameModel.invalid && usernameModel.touched">
+
+      <div *ngIf="usernameModel.errors && (usernameModel.invalid || usernameModel.touched)">
+        <small class="text-danger" *ngIf="usernameModel.errors?.['required']">Username is required</small>
+      </div>
+
+      <label>Password</label>
+      <input type="password" required #passwordModel="ngModel" class="form-control" name="password" [(ngModel)]="password"
+             [class.is-invalid]="passwordModel.invalid && passwordModel.touched">
+
+      <div *ngIf="passwordModel.errors && (passwordModel.invalid || passwordModel.touched)">
+        <small class="text-danger" *ngIf="passwordModel.errors?.['required']">Password is required</small>
       </div>
 
     </div>
