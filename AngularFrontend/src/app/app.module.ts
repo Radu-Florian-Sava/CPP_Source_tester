@@ -4,15 +4,21 @@ import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { FileUploadComponent } from './file-upload/file-upload.component';
+import { UserComponent } from './user/user.component';
+import { AdminComponent } from './admin/admin.component';
+import {RoutingModule} from "./routing/routing.module";
 
 @NgModule({
   declarations: [
-    FileUploadComponent
+    FileUploadComponent,
+    UserComponent,
+    AdminComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    RoutingModule
   ],
   providers: [],
   bootstrap: [FileUploadComponent]

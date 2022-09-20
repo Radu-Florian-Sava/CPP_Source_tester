@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --port 4200 --ssl --ssl-cert C:\\Users\\Radu\\AppData\\Roaming\\ASP.NET\\https\\angular-frontend.pem --ssl-key C:\\Users\\Radu\\AppData\\Roaming\\ASP.NET\\https\\angular-frontend.key",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",

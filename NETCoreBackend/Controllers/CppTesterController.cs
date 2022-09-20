@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Text.Json;
-using System.Security.Cryptography;
 using NETCoreBackend.Utility;
 
 namespace NETCoreBackend.Controllers
@@ -13,35 +12,43 @@ namespace NETCoreBackend.Controllers
 
         private readonly ILogger<CppTesterController> _logger;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private static string? inputFileName;
-        private static string? cppSourceName;
-        private static string outputTemplate;
-        private static int correctCounter = 0;
-        private static int compileCounter = 0;
-        private static IConfigurationSection configurationPaths = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build()
-            .GetSection("LocalPaths");
+        private readonly IConfigurationSection _configurationPaths;
+        private static string? _inputFileName;
+        private static string? _cppSourceName;
+        private static string? _outputTemplate;
+        private static int _correctCounter = 0;
+        private static int _compileCounter = 0;
 
         public CppTesterController(ILogger<CppTesterController> logger, IWebHostEnvironment webHostEnvironment)
         {
             _logger = logger;
             _webHostEnvironment = webHostEnvironment;
+            _configurationPaths = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("LocalPaths");
+            //_inputFileName = "input" + _uniqueIdentifier + ".txt";
+            //_outputTemplate = "expected_output" + _uniqueIdentifier + ".txt";
+            //_cppSourceName = "source" + _uniqueIdentifier + ".cpp";
+            //_cppSourceName = "source" + _uniqueIdentifier + ".cpp";
         }
 
         [HttpPost]
         [Route("postSource")]
         public IActionResult PostSource(IFormFile file)
         {
-            Console.WriteLine("Loaded source file: " + file.FileName);
-            string filePath = Path.Combine(configurationPaths["UploadPath"], file.FileName);
+
+            _cppSourceName = file.FileName;
+
+            string filePath = Path.Combine(_configurationPaths["UploadPath"], _cppSourceName);
+
+            Console.WriteLine("Loading source file: " + file.FileName + " to " + filePath);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 file.CopyTo(stream);
             }
 
-            cppSourceName = file.FileName;
-            correctCounter = 0;
-            compileCounter = 0;
+            _correctCounter = 0;
+            _compileCounter = 0;
+
             return Ok(JsonSerializer.Serialize("Cpp source uploaded"));
         } 
 
@@ -49,14 +56,17 @@ namespace NETCoreBackend.Controllers
         [Route("postInput")]
         public IActionResult PostInput(IFormFile file)
         {
-            Console.WriteLine("Loaded input file: " + file.FileName);
-            string filePath = Path.Combine(configurationPaths["UploadPath"], file.FileName);
+            _inputFileName = file.FileName;
+
+            string filePath = Path.Combine(_configurationPaths["UploadPath"], _inputFileName);
+
+            Console.WriteLine("Loading input file: " + file.FileName + " to " + filePath);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 file.CopyTo(stream);
             }
-            inputFileName = file.FileName;
+
             return Ok(JsonSerializer.Serialize("Input file uploaded"));
         }
 
@@ -64,14 +74,17 @@ namespace NETCoreBackend.Controllers
         [Route("postOutput")]
         public IActionResult PostOutput(IFormFile file)
         {
-            Console.WriteLine("Loaded output file: " + file.FileName);
-            string filePath = Path.Combine(configurationPaths["UploadPath"], file.FileName);
+            _outputTemplate = file.FileName;
+
+            string filePath = Path.Combine(_configurationPaths["UploadPath"], _outputTemplate);
+
+            Console.WriteLine("Loaded output file: " + file.FileName + " to " + filePath);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 file.CopyTo(stream);
             }
-            outputTemplate = file.FileName;
+
             return Ok(JsonSerializer.Serialize("Output template uploaded"));
         }
 
@@ -79,56 +92,57 @@ namespace NETCoreBackend.Controllers
         [Route("getRunCMD")]
         public IActionResult GetRun()
         {
-            if (inputFileName != null && cppSourceName != null && outputTemplate != null) 
+            if (_inputFileName != null && _cppSourceName != null && _outputTemplate != null) 
             {
                 return runCpp();
             }
             return BadRequest(JsonSerializer.Serialize("Enter files before compiling"));
         }
 
-        public IActionResult runCpp() 
+        private IActionResult runCpp() 
         {
-            string exeName = cppSourceName.Split('.')[0] + ".exe";
-            string outputFileName = cppSourceName.Split('.')[0] + "Output.txt";
-           
+            string exeName = _cppSourceName.Split('.')[0] + ".exe";
+            //string outputFileName = "computed_output" + _uniqueIdentifier + ".txt";
+            string outputFileName = _cppSourceName.Split('.')[0] + "_output.txt";
+
             Process process = processStartup();
 
             using (StreamWriter sw = process.StandardInput)
             {
                 if (sw.BaseStream.CanWrite)
                 {
-                    sw.WriteLine("cd " + configurationPaths["UploadPath"]);
-                    sw.WriteLine(configurationPaths["CompilerPath"] + cppSourceName + " -o " + exeName);
-                    sw.WriteLine(exeName + " " + inputFileName + " " + outputFileName);
+                    sw.WriteLine("cd " + _configurationPaths["UploadPath"]);
+                    sw.WriteLine(_configurationPaths["CompilerPath"] + _cppSourceName + " -o " + exeName);
+                    sw.WriteLine(exeName + " " + _inputFileName + " " + outputFileName);
                 }
             }
 
             process.WaitForExit();
 
-            compileCounter++;
+            _compileCounter++;
 
             if(process.ExitCode != 0)
             {
                 return BadRequest(JsonSerializer.Serialize("Code could not be compiled due to errors"));
             }
 
-            if (compareOutput(outputFileName, outputTemplate))
+            if (compareOutput(outputFileName, _outputTemplate))
             {
-                correctCounter++;
-                return Ok(JsonSerializer.Serialize("output for " + cppSourceName + " is correct " + correctCounter + "/" + compileCounter));
+                _correctCounter++;
+                return Ok(JsonSerializer.Serialize("output for " + _cppSourceName + " is correct " + _correctCounter + "/" + _compileCounter));
             }
             else
             {
-                return Ok(JsonSerializer.Serialize("output for " + cppSourceName + " is not correct " + correctCounter + "/" + compileCounter));
+                return Ok(JsonSerializer.Serialize("output for " + _cppSourceName + " is not correct " + _correctCounter + "/" + _compileCounter));
             }
         }
 
-        public Process processStartup()
+        private Process processStartup()
         {
             Process process = new Process();
             var processInfo = new ProcessStartInfo();
-            processInfo.WorkingDirectory = configurationPaths["WorkingDirectoryPath"];
-            processInfo.FileName = configurationPaths["CmdPath"];
+            processInfo.WorkingDirectory = _configurationPaths["WorkingDirectoryPath"];
+            processInfo.FileName = _configurationPaths["CmdPath"];
             processInfo.Verb = "runas";
             processInfo.UseShellExecute = false;
             processInfo.RedirectStandardInput = true;
@@ -143,12 +157,11 @@ namespace NETCoreBackend.Controllers
             process.BeginErrorReadLine();
             return process;
         }
-
-        public bool compareOutput(string computedOutput, string actualOutput)//compar outputFileName cu outputTemplate
+        
+        private bool compareOutput(string computedOutput, string actualOutput)
         {
-
-            string computedOutputFilePath = Path.Combine(configurationPaths["UploadPath"], computedOutput);
-            string actualOutputFilePath = Path.Combine(configurationPaths["UploadPath"], actualOutput);
+            string computedOutputFilePath = Path.Combine(_configurationPaths["UploadPath"], computedOutput);
+            string actualOutputFilePath = Path.Combine(_configurationPaths["UploadPath"], actualOutput);
 
             return CheckSum.SHA256CheckSum(computedOutputFilePath) == CheckSum.SHA256CheckSum(actualOutputFilePath);
 

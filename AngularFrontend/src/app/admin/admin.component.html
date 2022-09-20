@@ -1,0 +1,27 @@
+<div class="container-fluid">
+  <h1>Admin testing form</h1>
+  <form #userForm="ngForm" novalidate>
+
+    <div class="form-group">
+      <label>Input file</label>
+      <input type="file" required #inputFileModel="ngModel" class="form-control" name="inputFile" [(ngModel)]="inputFile"
+             [class.is-invalid]="inputFileModel.invalid && inputFileModel.touched" (change)="selectInputFile($event)">
+
+      <div *ngIf="inputFileModel.errors && (inputFileModel.invalid || inputFileModel.touched)">
+        <small class="text-danger" *ngIf="inputFileModel.errors?.['required']">Input file is required</small>
+      </div>
+
+      <label>Output file</label>
+      <input type="file" required #outputFileModel="ngModel" class="form-control" name="outputFile" [(ngModel)]="outputFile"
+             [class.is-invalid]="outputFileModel.invalid && outputFileModel.touched" (change)="selectOutputFile($event)">
+
+      <div *ngIf="outputFileModel.errors && (outputFileModel.invalid || outputFileModel.touched)">
+        <small class="text-danger" *ngIf="outputFileModel.errors?.['required']">Output file is required</small>
+      </div>
+
+    </div>
+
+    <button [disabled]="userForm.form.invalid" class="btn btn-primary" type="submit"
+            (click)="onSubmit()">Submit</button>
+  </form>
+</div>

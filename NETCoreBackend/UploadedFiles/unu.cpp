@@ -11,7 +11,9 @@ int main(int argc, char *argv[]) {
 	
 	int a, b;
 	fin >> a >> b;
-
+	
+	fout << a << endl;
+	fout << b << endl;
 	fout << a + b << endl;
 	
 	fin.close();

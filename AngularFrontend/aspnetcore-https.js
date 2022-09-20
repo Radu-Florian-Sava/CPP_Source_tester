@@ -16,6 +16,7 @@ if (!certificateName) {
   process.exit(-1);
 }
 
+
 const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
 const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
 
@@ -28,6 +29,10 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
     '--format',
     'Pem',
     '--no-password',
-  ], { stdio: 'inherit', })
-  .on('exit', (code) => process.exit(code));
+  ], {stdio: 'inherit',})
+    .on('exit', (code) => process.exit(code));
 }
+
+const ssl = {path: certFilePath,
+  key: keyFilePath }
+console.log(ssl);

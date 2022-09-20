@@ -1,0 +1,23 @@
+<div class="container-fluid">
+  <h1>Source loading form</h1>
+  <form #userForm="ngForm" novalidate>
+
+    <div class="form-group">
+
+      <label>Source</label>
+      <input type="file" required #source="ngModel" class="form-control" name="source" [(ngModel)]="selectedFile"
+        [class.is-invalid]="source.invalid && source.touched" (change)="selectSourceFile($event)">
+
+      <div *ngIf="source.errors && (source.invalid || source.touched)">
+        <small class="text-danger" *ngIf="source.errors?.['required']">Source is required</small>
+      </div>
+
+    </div>
+
+
+    <button [disabled]="userForm.form.invalid" class="btn btn-primary" type="submit"
+            (click)="onSubmit()">Submit</button>
+    <button [disabled]="userForm.form.invalid" class="btn btn-secondary ml-2" type="button"
+            (click)="runCMD()">Compile</button>
+  </form>
+</div>
