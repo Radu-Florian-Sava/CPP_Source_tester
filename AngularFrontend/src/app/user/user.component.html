@@ -4,20 +4,41 @@
 
     <div class="form-group">
 
-      <label>Source</label>
-      <input type="file" required #source="ngModel" class="form-control" name="source" [(ngModel)]="selectedFile"
-        [class.is-invalid]="source.invalid && source.touched" (change)="selectSourceFile($event)">
-
-      <div *ngIf="source.errors && (source.invalid || source.touched)">
-        <small class="text-danger" *ngIf="source.errors?.['required']">Source is required</small>
+      <div class="dropdown form-group">
+        <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+          Problems <span class="badge bg-secondary"> {{problems ? problems.length : 0}}</span>
+        </button>
+        <ul class="dropdown-menu">
+          <li *ngFor="let problem of problems; index as i">
+            <a class="dropdown-item" (click)="getProblem(problem)"> {{problem}} </a>
+          </li>
+        </ul>
       </div>
 
     </div>
 
+    <div *ngIf="description !== null" class="container-fluid">
+      <small>Description</small>
+      <div class="container-fluid bg-info border"> {{description}}</div>
+      <small>Input</small>
+      <div class="container-fluid bg-info border"> {{inputExample}}</div>
+      <small>Output</small>
+      <div class="container-fluid bg-info border"> {{outputExample}}</div>
+    </div>
+
+
+    <label>Source</label>
+    <input type="file" required #source="ngModel" class="form-control" name="source" [(ngModel)]="selectedFile"
+           [class.is-invalid]="source.invalid && source.touched" (change)="selectSourceFile($event)">
+    <div *ngIf="source.errors && (source.invalid || source.touched)">
+      <small class="text-danger" *ngIf="source.errors?.['required']">Source is required</small>
+    </div>
 
     <button [disabled]="userForm.form.invalid" class="btn btn-primary" type="submit"
-            (click)="onSubmit()">Submit</button>
+            (click)="onSubmit()">Submit
+    </button>
     <button [disabled]="userForm.form.invalid" class="btn btn-secondary ml-2" type="button"
-            (click)="runCMD()">Compile</button>
+            (click)="runCMD()">Compile
+    </button>
   </form>
 </div>

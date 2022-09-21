@@ -3,42 +3,61 @@
   <form #userForm="ngForm" novalidate>
 
     <div class="form-group">
-      {{this.token ? this.token : this.username + " " + this.password}}
-      <label>Input file</label>
-      <input type="file" required #inputFileModel="ngModel" class="form-control" name="inputFile" [(ngModel)]="inputFile"
-             [class.is-invalid]="inputFileModel.invalid && inputFileModel.touched" (change)="selectInputFile($event)">
+      <div *ngIf="token === null">
+        <label>Username</label>
+        <input type="text" required #usernameModel="ngModel" class="form-control" name="username" [(ngModel)]="username"
+               [class.is-invalid]="usernameModel.invalid && usernameModel.touched">
 
-      <div *ngIf="inputFileModel.errors && (inputFileModel.invalid || inputFileModel.touched)">
-        <small class="text-danger" *ngIf="inputFileModel.errors?.['required']">Input file is required</small>
+        <div *ngIf="usernameModel.errors && (usernameModel.invalid || usernameModel.touched)">
+          <small class="text-danger" *ngIf="usernameModel.errors?.['required']">Username is required</small>
+        </div>
+
+        <label>Password</label>
+        <input type="password" required #passwordModel="ngModel" class="form-control" name="password"
+               [(ngModel)]="password"
+               [class.is-invalid]="passwordModel.invalid && passwordModel.touched">
+
+        <div *ngIf="passwordModel.errors && (passwordModel.invalid || passwordModel.touched)">
+          <small class="text-danger" *ngIf="passwordModel.errors?.['required']">Password is required</small>
+        </div>
       </div>
 
-      <label>Output file</label>
-      <input type="file" required #outputFileModel="ngModel" class="form-control" name="outputFile" [(ngModel)]="outputFile"
-             [class.is-invalid]="outputFileModel.invalid && outputFileModel.touched" (change)="selectOutputFile($event)">
+      <div *ngIf="token !== null">
 
-      <div *ngIf="outputFileModel.errors && (outputFileModel.invalid || outputFileModel.touched)">
-        <small class="text-danger" *ngIf="outputFileModel.errors?.['required']">Output file is required</small>
+        <label>Description file</label>
+        <input type="file" required #descriptionFileModel="ngModel" class="form-control" name="descriptionFile"
+               [(ngModel)]="descriptionFile"
+               [class.is-invalid]="descriptionFileModel.invalid && descriptionFileModel.touched"
+               (change)="selectDescriptionFile($event)">
+
+        <div *ngIf="descriptionFileModel.errors && (descriptionFileModel.invalid || descriptionFileModel.touched)">
+          <small class="text-danger" *ngIf="descriptionFileModel.errors?.['required']">Description file is required</small>
+        </div>
+
+        <label>Input file</label>
+        <input type="file" required #inputFileModel="ngModel" class="form-control" name="inputFile"
+               [(ngModel)]="inputFile"
+               [class.is-invalid]="inputFileModel.invalid && inputFileModel.touched"
+               (change)="selectInputFile($event)">
+
+        <div *ngIf="inputFileModel.errors && (inputFileModel.invalid || inputFileModel.touched)">
+          <small class="text-danger" *ngIf="inputFileModel.errors?.['required']">Input file is required</small>
+        </div>
+
+        <label>Output file</label>
+        <input type="file" required #outputFileModel="ngModel" class="form-control" name="outputFile"
+               [(ngModel)]="outputFile"
+               [class.is-invalid]="outputFileModel.invalid && outputFileModel.touched"
+               (change)="selectOutputFile($event)">
+
+        <div *ngIf="outputFileModel.errors && (outputFileModel.invalid || outputFileModel.touched)">
+          <small class="text-danger" *ngIf="outputFileModel.errors?.['required']">Output file is required</small>
+        </div>
       </div>
-
-      <label>Username</label>
-      <input type="text" required #usernameModel="ngModel" class="form-control" name="username" [(ngModel)]="username"
-             [class.is-invalid]="usernameModel.invalid && usernameModel.touched">
-
-      <div *ngIf="usernameModel.errors && (usernameModel.invalid || usernameModel.touched)">
-        <small class="text-danger" *ngIf="usernameModel.errors?.['required']">Username is required</small>
-      </div>
-
-      <label>Password</label>
-      <input type="password" required #passwordModel="ngModel" class="form-control" name="password" [(ngModel)]="password"
-             [class.is-invalid]="passwordModel.invalid && passwordModel.touched">
-
-      <div *ngIf="passwordModel.errors && (passwordModel.invalid || passwordModel.touched)">
-        <small class="text-danger" *ngIf="passwordModel.errors?.['required']">Password is required</small>
-      </div>
-
     </div>
 
     <button [disabled]="userForm.form.invalid" class="btn btn-primary" type="submit"
-            (click)="onSubmit()">Submit</button>
+            (click)="onSubmit()">Submit
+    </button>
   </form>
 </div>

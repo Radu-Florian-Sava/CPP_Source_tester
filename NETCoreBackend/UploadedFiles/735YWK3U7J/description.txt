@@ -1,0 +1,10 @@
+2 pagini: rulare + admin                                                 1/1
+admin - input si output (si cerinta altfel nu are sens)
+user normal - cod
+
+verificare backend fisiere trimise                                       0/1
+
+adauagre metode backend(si modificare requesturi frontend)               1/1
+
+frontend mai intuitiv :P                                                 1/1
+

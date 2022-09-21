@@ -9,10 +9,15 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 export class UserComponent implements OnInit {
 
   selectedFile: File | any = null;
+  problems: string[] | null = null ;
   name: string;
+  inputExample : string | null = null;
+  outputExample : string | null = null;
+  description : string | null = null;
 
   constructor(private _http: HttpClient) {
-    this.name = "No source loaded yet"
+    this.name = "No source loaded yet";
+    this.getProblems();
   }
 
   ngOnInit(): void {}
@@ -36,6 +41,13 @@ export class UserComponent implements OnInit {
       });
   }
 
+  getProblems(): void{
+    this._http.get('http://localhost:5024/cpptester/getProblems')
+      .subscribe((res) => {
+        this.problems = res as string[];
+      });
+  }
+
   onSubmit() {
     this.name = this.selectedFile.name;
     const fileData = new FormData();
@@ -49,6 +61,15 @@ export class UserComponent implements OnInit {
 
         const statusList = document.getElementById("serverResponse");
         statusList?.appendChild(newAnswer);
+      });
+  }
+
+  getProblem(problem: string) {
+    this._http.get('http://localhost:5024/cpptester/getProblems/' + problem)
+      .subscribe((res) => {
+        this.description = (res as string[])[0];
+        this.inputExample = (res as string[])[1];
+        this.outputExample = (res as string[])[2];
       });
   }
 }

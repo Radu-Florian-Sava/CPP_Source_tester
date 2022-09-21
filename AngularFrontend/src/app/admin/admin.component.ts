@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {HttpClient} from "@angular/common/http";
+import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import * as CryptoJS from 'crypto-js';
 
 @Component({
@@ -10,23 +10,24 @@ import * as CryptoJS from 'crypto-js';
 
 export class AdminComponent implements OnInit {
 
-  inputFile: File | any = null;
-  outputFile: File | any = null;
+  descriptionFile: File| any;
+  inputFile: File| any;
+  outputFile: File| any;
   username: string | null = null;
   password: string | null = null;
   token: string | null = null;
 
-  constructor(private _http: HttpClient) {
-  }
+  constructor(private _http: HttpClient) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
-  onSubmit() {
-    this.checkCredentials();
+  async onSubmit() {
+    await this.checkCredentials();
     if (this.token !== null) {
-      this.submitInputFile();
-      this.submitOutputFile();
+
+      this.submitFile(this.descriptionFile, 'http://localhost:5024/cpptester/postDescription');
+      this.submitFile(this.inputFile, 'http://localhost:5024/cpptester/postInput');
+      this.submitFile(this.outputFile, 'http://localhost:5024/cpptester/postOutput');
     }
   }
 
@@ -45,10 +46,10 @@ export class AdminComponent implements OnInit {
     });
   }
 
-  private submitInputFile() {
+  public submitFile(file: File| any, url: string): void {
     const fileData = new FormData();
-    fileData.append('file', this.inputFile, this.token as string);
-    this._http.post('http://localhost:5024/cpptester/postInput', fileData)
+    fileData.append('file', file, this.token as string);
+    this._http.post(url, fileData)
       .subscribe((res) => {
         const newAnswer = document.createElement("li");
         newAnswer.innerText = JSON.stringify(res);
@@ -59,25 +60,15 @@ export class AdminComponent implements OnInit {
       });
   }
 
-  private submitOutputFile() {
-    const fileData = new FormData();
-    fileData.append('file', this.outputFile, this.token as string);
-    this._http.post('http://localhost:5024/cpptester/postOutput', fileData)
-      .subscribe((res) => {
-        const newAnswer = document.createElement("li");
-        newAnswer.innerText = JSON.stringify(res);
-        newAnswer.className += " list-group-item";
-
-        const statusList = document.getElementById("serverResponse");
-        statusList?.appendChild(newAnswer);
-      });
+  public selectDescriptionFile(event: any): void{
+    this.descriptionFile = event.target.files[0];
   }
 
-  selectInputFile(event: any) {
+  public selectInputFile(event: any): void{
     this.inputFile = event.target.files[0];
   }
 
-  selectOutputFile(event: any) {
+  public selectOutputFile(event: any): void{
     this.outputFile = event.target.files[0];
   }
 
