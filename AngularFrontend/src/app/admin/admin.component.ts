@@ -11,8 +11,7 @@ import * as CryptoJS from 'crypto-js';
 export class AdminComponent implements OnInit {
 
   descriptionFile: File| any;
-  inputFile: File| any;
-  outputFile: File| any;
+  pairFiles: File[][]| any = [["", ""]];
   username: string | null = null;
   password: string | null = null;
   token: string | null = null;
@@ -26,8 +25,10 @@ export class AdminComponent implements OnInit {
     if (this.token !== null) {
 
       this.submitFile(this.descriptionFile, 'http://localhost:5024/cpptester/postDescription');
-      this.submitFile(this.inputFile, 'http://localhost:5024/cpptester/postInput');
-      this.submitFile(this.outputFile, 'http://localhost:5024/cpptester/postOutput');
+      for(let i = 1; i <= this.pairFiles.length; i++  ){
+        this.submitFile(this.pairFiles[i - 1][0], `http://localhost:5024/cpptester/postInput/${i}`);
+        this.submitFile(this.pairFiles[i - 1][1], `http://localhost:5024/cpptester/postOutput/${i}`);
+      }
     }
   }
 
@@ -52,7 +53,7 @@ export class AdminComponent implements OnInit {
     this._http.post(url, fileData)
       .subscribe((res) => {
         const newAnswer = document.createElement("li");
-        newAnswer.innerText = JSON.stringify(res);
+        newAnswer.innerText = res as string;
         newAnswer.className += " list-group-item";
 
         const statusList = document.getElementById("serverResponse");
@@ -64,12 +65,15 @@ export class AdminComponent implements OnInit {
     this.descriptionFile = event.target.files[0];
   }
 
-  public selectInputFile(event: any): void{
-    this.inputFile = event.target.files[0];
+  public selectInputFile(event: any, index: number): void{
+    this.pairFiles[index][0] = event.target.files[0];
   }
 
-  public selectOutputFile(event: any): void{
-    this.outputFile = event.target.files[0];
+  public selectOutputFile(event: any, index: number): void{
+    this.pairFiles[index][1] = event.target.files[0];
   }
 
+  addFilePair() :void{
+    this.pairFiles.push(["", ""]);
+  }
 }

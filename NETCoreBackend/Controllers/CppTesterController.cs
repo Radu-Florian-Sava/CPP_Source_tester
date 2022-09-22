@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Text.Json;
 using NETCoreBackend.Utility;
+using System.Text.RegularExpressions;
 
 namespace NETCoreBackend.Controllers
 {
@@ -14,8 +15,6 @@ namespace NETCoreBackend.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IConfigurationSection _configurationPaths;
         private readonly IConfigurationSection _credentials;
-        private static int _correctCounter = 0;
-        private static int _compileCounter = 0;
         private static string? _token = null;
         private static string? _unploadFolderName = null;
 
@@ -63,14 +62,15 @@ namespace NETCoreBackend.Controllers
             return Ok(JsonSerializer.Serialize(directoryNames));
         }
 
-        [HttpPost]
-        [Route("postSource")]
-        public IActionResult PostSource(IFormFile file)
+        [HttpPost("postSource/{id}")]
+        public IActionResult PostSource(IFormFile file, [FromRoute] string id)
         {
 
             string cppSourceName = "source.cpp";
 
-            string filePath = Path.Combine(_unploadFolderName, cppSourceName);
+            string uploadFolder = Path.Combine(_configurationPaths["UploadPath"], id);
+
+            string filePath = Path.Combine(uploadFolder, cppSourceName);
 
             Console.WriteLine("Source file loading at {0}", filePath);
 
@@ -78,9 +78,6 @@ namespace NETCoreBackend.Controllers
             {
                 file.CopyTo(stream);
             }
-
-            _correctCounter = 0;
-            _compileCounter = 0;
 
             return Ok(JsonSerializer.Serialize("Cpp source uploaded"));
         }
@@ -109,9 +106,8 @@ namespace NETCoreBackend.Controllers
             return Ok(JsonSerializer.Serialize("Description file uploaded"));
         }
 
-        [HttpPost]
-        [Route("postInput")]
-        public IActionResult PostInput(IFormFile file)
+        [HttpPost("postInput/{id}")]
+        public IActionResult PostInput(IFormFile file, [FromRoute] int id)
         {
 
             if (file.FileName != _token)
@@ -119,7 +115,7 @@ namespace NETCoreBackend.Controllers
                 return Ok(JsonSerializer.Serialize("Invalid credentials"));
             }
 
-            string inputFileName = "input.txt";
+            string inputFileName = "input" + id + ".txt";
 
             string filePath = Path.Combine(_unploadFolderName, inputFileName);
 
@@ -132,16 +128,15 @@ namespace NETCoreBackend.Controllers
             return Ok(JsonSerializer.Serialize("Input file uploaded"));
         }
 
-        [HttpPost]
-        [Route("postOutput")]
-        public IActionResult PostOutput(IFormFile file)
+        [HttpPost("postOutput/{id}")]
+        public IActionResult PostOutput(IFormFile file, [FromRoute] int id)
         {
             if (file.FileName != _token)
             {
                 return Ok(JsonSerializer.Serialize("Invalid credentials"));
             }
 
-            string outputTemplate = "output.txt";
+            string outputTemplate = "output" + id + ".txt";
 
             string filePath = Path.Combine(_unploadFolderName, outputTemplate);
 
@@ -155,55 +150,59 @@ namespace NETCoreBackend.Controllers
             return Ok(JsonSerializer.Serialize("Output template uploaded"));
         }
 
-        [HttpGet]
-        [Route("getRunCMD")]
-        public IActionResult GetRun()
+        [HttpGet("getRunCMD/{id}")]
+        public IActionResult GetRun([FromRoute] string id)
         {
-            return runCpp();
+            return runCpp(id);
         }
 
         [HttpGet("getProblems/{problemName}")]
         public IActionResult getProblemById([FromRoute] string problemName)
         {
             string directoryName = Path.Combine(_configurationPaths["UploadPath"], problemName);
-            string input = System.IO.File.ReadAllText(Path.Combine(directoryName, "input.txt"));
-            string output = System.IO.File.ReadAllText(Path.Combine(directoryName, "output.txt"));
+            string input = System.IO.File.ReadAllText(Path.Combine(directoryName, "input1.txt"));
+            string output = System.IO.File.ReadAllText(Path.Combine(directoryName, "output1.txt"));
             string description = System.IO.File.ReadAllText(Path.Combine(directoryName, "description.txt"));
             return Ok(new string[] { description, input, output });
         }
 
-        private IActionResult runCpp() 
+        private IActionResult runCpp(string id) 
         {
             Process process = processStartup();
-
+            string runPath = Path.Combine(_configurationPaths["UploadPath"], id);
+            int total = 0, correct = 0;
             using (StreamWriter sw = process.StandardInput)
             {
                 if (sw.BaseStream.CanWrite)
                 {
-                    sw.WriteLine("cd " + _unploadFolderName);
+                    sw.WriteLine("cd " + runPath);
                     sw.WriteLine(_configurationPaths["CompilerPath"] + " source.cpp -o source.exe");
-                    sw.WriteLine("source.exe input.txt source_output.txt");
+                    total = Directory.GetFiles(runPath).Where( path => Regex.Match(path, @".input\d+\.txt$").Success).Count();
+                    for (int i=1;i <= total; i++)
+                    {
+                        sw.WriteLine("source.exe input" + i + ".txt source_output" + i +".txt");
+                    }
                 }
             }
 
             process.WaitForExit();
 
-            _compileCounter++;
 
             if(process.ExitCode != 0)
             {
                 return BadRequest(JsonSerializer.Serialize("Code could not be compiled due to errors"));
             }
 
-            if (compareOutput("source_output.txt", "output.txt"))
+            for(int i=1;i < total;i++)
             {
-                _correctCounter++;
-                return Ok(JsonSerializer.Serialize("output is correct " + _correctCounter + "/" + _compileCounter));
+                if(compareOutput(runPath, "source_output" + i +".txt", "output"+ i + ".txt"))
+                {
+                    correct++;
+                }
             }
-            else
-            {
-                return Ok(JsonSerializer.Serialize("output is not correct " + _correctCounter + "/" + _compileCounter));
-            }
+            Directory.GetFiles(runPath).Where(path => Regex.Match(path, @".source_output\d+\.txt$").Success)
+                .ToList().ForEach(path => System.IO.File.Delete(path));
+            return Ok(JsonSerializer.Serialize("Score is " + correct + "/" + total));
         }
 
         private Process processStartup()
@@ -227,13 +226,12 @@ namespace NETCoreBackend.Controllers
             return process;
         }
         
-        private bool compareOutput(string computedOutput, string actualOutput)
+        private bool compareOutput(string runPath,string computedOutput, string actualOutput)
         {
-            string computedOutputFilePath = Path.Combine(_unploadFolderName, computedOutput);
-            string actualOutputFilePath = Path.Combine(_unploadFolderName, actualOutput);
+            string computedOutputFilePath = Path.Combine(runPath, computedOutput);
+            string actualOutputFilePath = Path.Combine(runPath, actualOutput);
 
             return CheckSum.SHA256CheckSum(computedOutputFilePath) == CheckSum.SHA256CheckSum(actualOutputFilePath);
-
         }
 
         private IEnumerable<string> extractProblemNames(IEnumerable<string> problems)
