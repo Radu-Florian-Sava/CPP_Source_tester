@@ -1,0 +1,12 @@
+Linux -> Windows
+cat   -> type
+ls    -> dir
+chmod -> attrib
+cd    -> cd
+mkdir -> mkdir
+rmdir -> rmdir
+cp    -> copy, xcopy
+mv    -> move, rename
+
+change drive: C:>[DriveName:]
+open file: filename

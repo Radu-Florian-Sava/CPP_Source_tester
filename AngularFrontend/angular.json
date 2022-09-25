@@ -72,6 +72,9 @@
           },
           "defaultConfiguration": "development",
           "options": {
+            "ssl": true,
+            "sslCert": "certificate.pem",
+            "sslKey": "certificate.key",
             "proxyConfig": "src/proxy.conf.js"
           }
         },

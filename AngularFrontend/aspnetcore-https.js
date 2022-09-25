@@ -20,6 +20,7 @@ if (!certificateName) {
 const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
 const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
 
+
 if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
   spawn('dotnet', [
     'dev-certs',
@@ -33,6 +34,21 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
     .on('exit', (code) => process.exit(code));
 }
 
-const ssl = {path: certFilePath,
-  key: keyFilePath }
-console.log(ssl);
+if (!fs.existsSync('./certificate.pem')) {
+  fs.copyFile(certFilePath, './certificate.pem', (err) => {
+    if (err) {
+      console.log(err);
+    }
+  });
+}
+
+if (!fs.existsSync('./certificate.key')) {
+  fs.copyFile(certFilePath, './certificate.key', (err) => {
+    if (err) {
+      console.log(err);
+    }
+  });
+}
+
+console.log("SSL certificate data can be found in the certificate.pem and certificate.key files in the parent folder");
+console.log("To change this setting, check out the package.json file and the angular.json options attribute")
