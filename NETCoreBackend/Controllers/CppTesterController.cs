@@ -16,7 +16,7 @@ namespace NETCoreBackend.Controllers
         private readonly IConfigurationSection _configurationPaths;
         private readonly IConfigurationSection _credentials;
         private static string? _token = null;
-        private static string? _unploadFolderName = null;
+        private static string? _uploadFolderName = null;
 
         public CppTesterController(ILogger<CppTesterController> logger, IWebHostEnvironment webHostEnvironment)
         {
@@ -25,8 +25,7 @@ namespace NETCoreBackend.Controllers
             _credentials = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build().GetSection("AdminCredentials");
         }
 
-        [HttpPost]
-        [Route("postCredentials")]
+        [HttpPost("credentials")]
         public IActionResult PostCredentials([FromBody] Credentials credentials)
         {
             string? username = credentials.username;
@@ -39,9 +38,9 @@ namespace NETCoreBackend.Controllers
                     do
                     {
                         _token = TokenGenerator.GenerateToken(10);
-                        _unploadFolderName = Path.Combine(_configurationPaths["UploadPath"], _token);
-                    } while (Directory.Exists(_unploadFolderName));
-                    Directory.CreateDirectory(_unploadFolderName);
+                        _uploadFolderName = Path.Combine(_configurationPaths["UploadPath"], _token);
+                    } while (Directory.Exists(_uploadFolderName));
+                    Directory.CreateDirectory(_uploadFolderName);
                     Console.WriteLine("Generated token: {0}", _token);
                     return Ok(JsonSerializer.Serialize(_token));
                 }
@@ -53,24 +52,37 @@ namespace NETCoreBackend.Controllers
             return Ok("Already logged in");
         }
 
+        [HttpDelete("credentials/{token}")]
+        public void DeleteCredentials([FromRoute] string token)
+        {
+            if(_token == token)
+            {
+                Console.WriteLine(String.Format("TOKEN {0} DELTED", _token));
+                _token = null;
+            }
+            else
+            {
+                Console.WriteLine("TOKEN DELETION REFUSED");
+            }
+        }
 
-        [HttpGet]
-        [Route("getProblems")]
+
+        [HttpGet("problems")]
         public IActionResult GetProblems()
         {
             var directoryNames = extractProblemNames(Directory.EnumerateDirectories(_configurationPaths["UploadPath"]));
             return Ok(JsonSerializer.Serialize(directoryNames));
         }
 
-        [HttpPost("postSource/{id}")]
-        public IActionResult PostSource(IFormFile file, [FromRoute] string id)
+        [HttpPost("source/{id}/{username}")]
+        public IActionResult PostSource(IFormFile file, [FromRoute] string id, [FromRoute] string username)
         {
 
             string cppSourceName = "source.cpp";
-
             string uploadFolder = Path.Combine(_configurationPaths["UploadPath"], id);
-
-            string filePath = Path.Combine(uploadFolder, cppSourceName);
+            string userPath = Path.Combine(uploadFolder, username);
+            Directory.CreateDirectory(userPath);
+            string filePath = Path.Combine(userPath, cppSourceName); 
 
             Console.WriteLine("Source file loading at {0}", filePath);
 
@@ -82,8 +94,7 @@ namespace NETCoreBackend.Controllers
             return Ok(JsonSerializer.Serialize("Cpp source uploaded"));
         }
 
-        [HttpPost]
-        [Route("postDescription")]
+        [HttpPost("description")]
         public IActionResult PostDescription(IFormFile file)
         {
 
@@ -93,8 +104,7 @@ namespace NETCoreBackend.Controllers
             }
 
             string inputFileName = "description.txt";
-
-            string filePath = Path.Combine(_unploadFolderName, inputFileName);
+            string filePath = Path.Combine(_uploadFolderName, inputFileName);
 
             Console.WriteLine("Description file loading at {0}", filePath);
 
@@ -106,7 +116,7 @@ namespace NETCoreBackend.Controllers
             return Ok(JsonSerializer.Serialize("Description file uploaded"));
         }
 
-        [HttpPost("postInput/{id}")]
+        [HttpPost("input/{id}")]
         public IActionResult PostInput(IFormFile file, [FromRoute] int id)
         {
 
@@ -116,8 +126,7 @@ namespace NETCoreBackend.Controllers
             }
 
             string inputFileName = "input" + id + ".txt";
-
-            string filePath = Path.Combine(_unploadFolderName, inputFileName);
+            string filePath = Path.Combine(_uploadFolderName, inputFileName);
 
             Console.WriteLine("Input file loading at {0}", filePath);
 
@@ -128,7 +137,7 @@ namespace NETCoreBackend.Controllers
             return Ok(JsonSerializer.Serialize("Input file uploaded"));
         }
 
-        [HttpPost("postOutput/{id}")]
+        [HttpPost("output/{id}")]
         public IActionResult PostOutput(IFormFile file, [FromRoute] int id)
         {
             if (file.FileName != _token)
@@ -138,7 +147,7 @@ namespace NETCoreBackend.Controllers
 
             string outputTemplate = "output" + id + ".txt";
 
-            string filePath = Path.Combine(_unploadFolderName, outputTemplate);
+            string filePath = Path.Combine(_uploadFolderName, outputTemplate);
 
             Console.WriteLine("Output file loading at {0}", filePath);
 
@@ -150,13 +159,13 @@ namespace NETCoreBackend.Controllers
             return Ok(JsonSerializer.Serialize("Output template uploaded"));
         }
 
-        [HttpGet("getRunCMD/{id}")]
-        public IActionResult GetRun([FromRoute] string id)
+        [HttpGet("run/{id}/{username}")]
+        public IActionResult GetRun([FromRoute] string id, [FromRoute] string username)
         {
-            return runCpp(id);
+            return runCpp(id, username);
         }
 
-        [HttpGet("getProblems/{problemName}")]
+        [HttpGet("problems/{problemName}")]
         public IActionResult getProblemById([FromRoute] string problemName)
         {
             string directoryName = Path.Combine(_configurationPaths["UploadPath"], problemName);
@@ -166,10 +175,11 @@ namespace NETCoreBackend.Controllers
             return Ok(new string[] { description, input, output });
         }
 
-        private IActionResult runCpp(string id) 
+        private IActionResult runCpp(string id, string username) 
         {
             Process process = processStartup();
-            string runPath = Path.Combine(_configurationPaths["UploadPath"], id);
+            string runPath = Path.Combine(_configurationPaths["UploadPath"], id, username);
+            string problemPath = Path.Combine(_configurationPaths["UploadPath"], id);
             int total = 0, correct = 0;
             using (StreamWriter sw = process.StandardInput)
             {
@@ -177,10 +187,10 @@ namespace NETCoreBackend.Controllers
                 {
                     sw.WriteLine("cd " + runPath);
                     sw.WriteLine(_configurationPaths["CompilerPath"] + " source.cpp -o source.exe");
-                    total = Directory.GetFiles(runPath).Where( path => Regex.Match(path, @".input\d+\.txt$").Success).Count();
+                    total = Directory.GetFiles(problemPath).Where( path => Regex.Match(path, @".input\d+\.txt$").Success).Count();
                     for (int i=1;i <= total; i++)
                     {
-                        sw.WriteLine("source.exe input" + i + ".txt source_output" + i +".txt");
+                        sw.WriteLine("source.exe ../input" + i + ".txt source_output" + i +".txt");
                     }
                 }
             }
@@ -193,31 +203,40 @@ namespace NETCoreBackend.Controllers
                 return BadRequest(JsonSerializer.Serialize("Code could not be compiled due to errors"));
             }
 
-            for(int i=1;i < total;i++)
+            for(int i=1;i <= total;i++)
             {
-                if(compareOutput(runPath, "source_output" + i +".txt", "output"+ i + ".txt"))
+                string computedOutputFile = string.Format("source_output{0}.txt", i);
+                string actualOutputFile = string.Format("../output{0}.txt", i);
+                if (compareOutput(runPath, computedOutputFile, actualOutputFile))
                 {
+                    Console.WriteLine(String.Format("Files {0} and {1} are identical", computedOutputFile, actualOutputFile));
                     correct++;
                 }
+                else
+                {
+                    Console.WriteLine(String.Format("NOTICE: {0} and {1} are different", computedOutputFile, actualOutputFile));
+                }
             }
-            Directory.GetFiles(runPath).Where(path => Regex.Match(path, @".source_output\d+\.txt$").Success)
-                .ToList().ForEach(path => System.IO.File.Delete(path));
             return Ok(JsonSerializer.Serialize("Score is " + correct + "/" + total));
         }
 
         private Process processStartup()
         {
-            Process process = new Process();
-            var processInfo = new ProcessStartInfo();
-            processInfo.WorkingDirectory = _configurationPaths["WorkingDirectoryPath"];
-            processInfo.FileName = _configurationPaths["CmdPath"];
-            processInfo.Verb = "runas";
-            processInfo.UseShellExecute = false;
-            processInfo.RedirectStandardInput = true;
-            processInfo.RedirectStandardOutput = true;
-            processInfo.RedirectStandardError = true;
-            processInfo.WindowStyle = ProcessWindowStyle.Maximized;
-            process.StartInfo = processInfo;
+            var processInfo = new ProcessStartInfo
+            {
+                WorkingDirectory = _configurationPaths["WorkingDirectoryPath"],
+                FileName = _configurationPaths["CmdPath"],
+                Verb = "runas",
+                UseShellExecute = false,
+                RedirectStandardInput = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                WindowStyle = ProcessWindowStyle.Maximized
+            };
+            Process process = new Process
+            {
+                StartInfo = processInfo
+            };
             process.Start();
             process.OutputDataReceived += (sender, e) => { Console.WriteLine(e.Data); };
             process.ErrorDataReceived += (sender, e) => { Console.WriteLine(e.Data); };

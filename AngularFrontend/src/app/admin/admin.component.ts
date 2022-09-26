@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from "@angular/common/http";
 import * as CryptoJS from 'crypto-js';
 
@@ -8,7 +8,7 @@ import * as CryptoJS from 'crypto-js';
   styleUrls: ['./admin.component.css']
 })
 
-export class AdminComponent implements OnInit {
+export class AdminComponent implements OnInit, OnDestroy {
 
   descriptionFile: File| any;
   pairFiles: File[][]| any = [["", ""]];
@@ -20,24 +20,29 @@ export class AdminComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  ngOnDestroy(): void {
+    this._http.delete(`http://localhost:5024/cpptester/credentials/${this.token}`);
+  }
+
   async onSubmit() {
     await this.checkCredentials();
     if (this.token !== null) {
 
-      this.submitFile(this.descriptionFile, 'http://localhost:5024/cpptester/postDescription');
+      this.submitFile(this.descriptionFile, 'http://localhost:5024/cpptester/description');
       for(let i = 1; i <= this.pairFiles.length; i++  ){
-        this.submitFile(this.pairFiles[i - 1][0], `http://localhost:5024/cpptester/postInput/${i}`);
-        this.submitFile(this.pairFiles[i - 1][1], `http://localhost:5024/cpptester/postOutput/${i}`);
+        this.submitFile(this.pairFiles[i - 1][0], `http://localhost:5024/cpptester/input/${i}`);
+        this.submitFile(this.pairFiles[i - 1][1], `http://localhost:5024/cpptester/output/${i}`);
       }
     }
   }
+
 
   private checkCredentials() {
     if (this.password === null || this.username === null || this.token !== null) {
       return;
     }
     let hashedPassword = CryptoJS.SHA256(this.password).toString();
-    this._http.post('http://localhost:5024/cpptester/postCredentials',
+    this._http.post('http://localhost:5024/cpptester/credentials',
       {
         "username": this.username,
         "password": hashedPassword

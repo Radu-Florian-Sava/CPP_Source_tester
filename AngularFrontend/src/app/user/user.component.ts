@@ -14,6 +14,7 @@ export class UserComponent implements OnInit {
   inputExample : string | null = null;
   outputExample : string | null = null;
   description : string | null = null;
+  selectedUser: string = "";
 
   constructor(private _http: HttpClient) {
     this.problemName = "None";
@@ -30,7 +31,7 @@ export class UserComponent implements OnInit {
     const options = {
       headers: new HttpHeaders().append('Content-type', 'application/json')
     }
-    this._http.get<string>('http://localhost:5024/cpptester/getRunCMD/' + this.problemName, options)
+    this._http.get<string>(`http://localhost:5024/cpptester/run/${this.problemName}/${this.selectedUser}`, options)
       .subscribe((res) => {
         const newAnswer = document.createElement("li");
         newAnswer.textContent = res as string;
@@ -42,7 +43,7 @@ export class UserComponent implements OnInit {
   }
 
   getProblems(): void{
-    this._http.get('http://localhost:5024/cpptester/getProblems')
+    this._http.get('http://localhost:5024/cpptester/problems')
       .subscribe((res) => {
         this.problems = res as string[];
       });
@@ -51,7 +52,7 @@ export class UserComponent implements OnInit {
   onSubmit() {
     const fileData = new FormData();
     fileData.append('file', this.selectedFile, this.selectedFile.name);
-    this._http.post('http://localhost:5024/cpptester/postSource/' + this.problemName, fileData)
+    this._http.post(`http://localhost:5024/cpptester/source/${this.problemName}/${this.selectedUser}`, fileData)
       .subscribe((res) => {
 
         const newAnswer = document.createElement("li");
@@ -64,7 +65,7 @@ export class UserComponent implements OnInit {
   }
 
   getProblem(problem: string) {
-    this._http.get('http://localhost:5024/cpptester/getProblems/' + problem)
+    this._http.get(`http://localhost:5024/cpptester/problems/${problem}`)
       .subscribe((res) => {
         this.problemName = problem;
         this.description = (res as string[])[0];

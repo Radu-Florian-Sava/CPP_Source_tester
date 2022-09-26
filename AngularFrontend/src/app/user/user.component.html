@@ -27,7 +27,14 @@
     </div>
 
 
-    <label>Source</label>
+    <label>Name</label>
+
+    <input type="text" required #username="ngModel" class="form-control" name="username" [(ngModel)]="selectedUser"
+           [class.is-invalid]="username.invalid && username.touched" (change)="selectSourceFile($event)">
+    <div *ngIf="username.errors && (username.invalid || username.touched)">
+      <small class="text-danger" *ngIf="username.errors?.['required']">Complete with your name</small>
+    </div>
+
     <input type="file" required #source="ngModel" class="form-control" name="source" [(ngModel)]="selectedFile"
            [class.is-invalid]="source.invalid && source.touched" (change)="selectSourceFile($event)">
     <div *ngIf="source.errors && (source.invalid || source.touched)">
