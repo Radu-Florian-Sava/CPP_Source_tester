@@ -197,6 +197,7 @@ namespace NETCoreBackend.Controllers
 
             process.WaitForExit();
 
+            Console.WriteLine(String.Format("Process exit code was {0}", process.ExitCode));
 
             if(process.ExitCode != 0)
             {

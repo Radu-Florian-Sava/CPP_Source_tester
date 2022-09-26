@@ -32,14 +32,17 @@ export class UserComponent implements OnInit {
       headers: new HttpHeaders().append('Content-type', 'application/json')
     }
     this._http.get<string>(`http://localhost:5024/cpptester/run/${this.problemName}/${this.selectedUser}`, options)
-      .subscribe((res) => {
+      .subscribe(res => {
         const newAnswer = document.createElement("li");
         newAnswer.textContent = res as string;
         newAnswer.className += " list-group-item";
 
         const statusList = document.getElementById("serverResponse");
         statusList?.appendChild(newAnswer);
-      });
+      },
+        error => {
+            window.alert(error);
+        });
   }
 
   getProblems(): void{

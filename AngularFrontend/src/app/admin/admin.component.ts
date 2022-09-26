@@ -46,10 +46,13 @@ export class AdminComponent implements OnInit, OnDestroy {
       {
         "username": this.username,
         "password": hashedPassword
-      }).subscribe((res) => {
-      console.log(res);
-      this.token = res as string;
-    });
+      }).subscribe(
+        data => {
+          console.log(data);
+          this.token = data as string;
+        },
+          error => window.alert('Credentials are not correct')
+    );
   }
 
   public submitFile(file: File| any, url: string): void {
