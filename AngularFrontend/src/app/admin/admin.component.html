@@ -3,7 +3,7 @@
   <form #userForm="ngForm" novalidate>
 
     <div class="form-group">
-      <div *ngIf="token === null">
+      <div *ngIf="this.token === null">
         <label>Username</label>
         <input type="text" required #usernameModel="ngModel" class="form-control" name="username"
                [(ngModel)]="username" [ngModelOptions]="{standalone: true}"
@@ -23,7 +23,7 @@
         </div>
       </div>
 
-      <div *ngIf="token !== null">
+      <div *ngIf="this.token !== null">
 
         <label>Description file</label>
         <input type="file" required #descriptionFileModel="ngModel" class="form-control" name="descriptionFile"

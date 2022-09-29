@@ -57,7 +57,7 @@ namespace NETCoreBackend.Controllers
         {
             if(_token == token)
             {
-                Console.WriteLine(String.Format("TOKEN {0} DELTED", _token));
+                Console.WriteLine(String.Format("TOKEN {0} DELETED", _token));
                 _token = null;
             }
             else
@@ -66,6 +66,20 @@ namespace NETCoreBackend.Controllers
             }
         }
 
+
+        [HttpGet("hash/{toBeHashed}")]
+        public void ShowHash([FromRoute] string toBeHashed)
+        {
+
+            using (System.Security.Cryptography.SHA256 hash = System.Security.Cryptography.SHA256.Create())
+            {
+                string hashed = String.Concat(hash
+                  .ComputeHash(System.Text.Encoding.UTF8.GetBytes(toBeHashed))
+                  .Select(item => item.ToString("x2")));
+                Console.WriteLine("Hash of {0} is {1}", toBeHashed, hashed);
+
+            }
+        }
 
         [HttpGet("problems")]
         public IActionResult GetProblems()

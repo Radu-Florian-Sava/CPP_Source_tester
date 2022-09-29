@@ -10,28 +10,42 @@ import * as CryptoJS from 'crypto-js';
 
 export class AdminComponent implements OnInit, OnDestroy {
 
-  descriptionFile: File| any;
-  pairFiles: File[][]| any = [["", ""]];
+  descriptionFile: File | any;
+  pairFiles: File[][] | any = [["", ""]];
   username: string | null = null;
   password: string | null = null;
   token: string | null = null;
+  private readonly _serverAddress: string;
 
-  constructor(private _http: HttpClient) {}
+  constructor(private _http: HttpClient) {
+    this._serverAddress = "http://localhost:5024";
+  }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
+
 
   ngOnDestroy(): void {
-    this._http.delete(`http://localhost:5024/cpptester/credentials/${this.token}`);
+    if (this.token !== null) {
+      this._http.delete(`${this._serverAddress}/cpptester/credentials/${this.token}`).subscribe({
+        next: data => {
+          window.alert("Server data returned to normal");
+        },
+        error: error => {
+          window.alert("Internal server error");
+        }
+      });
+    }
   }
 
   async onSubmit() {
     await this.checkCredentials();
     if (this.token !== null) {
 
-      this.submitFile(this.descriptionFile, 'http://localhost:5024/cpptester/description');
-      for(let i = 1; i <= this.pairFiles.length; i++  ){
-        this.submitFile(this.pairFiles[i - 1][0], `http://localhost:5024/cpptester/input/${i}`);
-        this.submitFile(this.pairFiles[i - 1][1], `http://localhost:5024/cpptester/output/${i}`);
+      this.submitFile(this.descriptionFile, `${this._serverAddress}/cpptester/description`);
+      for (let i = 1; i <= this.pairFiles.length; i++) {
+        this.submitFile(this.pairFiles[i - 1][0], `${this._serverAddress}/cpptester/input/${i}`);
+        this.submitFile(this.pairFiles[i - 1][1], `${this._serverAddress}/cpptester/output/${i}`);
       }
     }
   }
@@ -42,22 +56,22 @@ export class AdminComponent implements OnInit, OnDestroy {
       return;
     }
     let hashedPassword = CryptoJS.SHA256(this.password).toString();
-    this._http.post('http://localhost:5024/cpptester/credentials',
+    this._http.post(`${this._serverAddress}/cpptester/credentials`,
       {
         "username": this.username,
         "password": hashedPassword
       }).subscribe(
-        data => {
-          console.log(data);
-          this.token = data as string;
-        },
-          error => {
-            window.alert("Credentials are not correct");
-          }
+      data => {
+        console.log(data);
+        this.token = data as string;
+      },
+      error => {
+        window.alert("Credentials are not correct");
+      }
     );
   }
 
-  public submitFile(file: File| any, url: string): void {
+  public submitFile(file: File | any, url: string): void {
     const fileData = new FormData();
     fileData.append("file", file, this.token as string);
     this._http.post(url, fileData)
@@ -71,19 +85,19 @@ export class AdminComponent implements OnInit, OnDestroy {
       });
   }
 
-  public selectDescriptionFile(event: any): void{
+  public selectDescriptionFile(event: any): void {
     this.descriptionFile = event.target.files[0];
   }
 
-  public selectInputFile(event: any, index: number): void{
+  public selectInputFile(event: any, index: number): void {
     this.pairFiles[index][0] = event.target.files[0];
   }
 
-  public selectOutputFile(event: any, index: number): void{
+  public selectOutputFile(event: any, index: number): void {
     this.pairFiles[index][1] = event.target.files[0];
   }
 
-  addFilePair() :void{
+  addFilePair(): void {
     this.pairFiles.push(["", ""]);
   }
 }

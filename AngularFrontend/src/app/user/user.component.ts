@@ -15,9 +15,11 @@ export class UserComponent implements OnInit {
   outputExample: string | null = null;
   description: string | null = null;
   selectedUser: string = "";
+  private readonly _serverAddress ;
 
   constructor(private _http: HttpClient) {
     this.problemName = "None";
+    this._serverAddress = "http://localhost:5024";
     this.getProblems();
   }
 
@@ -32,7 +34,7 @@ export class UserComponent implements OnInit {
     const options = {
       headers: new HttpHeaders().append('Content-type', 'application/json')
     }
-    this._http.get<string>(`http://localhost:5024/cpptester/run/${this.problemName}/${this.selectedUser}`, options)
+    this._http.get<string>(`${this._serverAddress}/cpptester/run/${this.problemName}/${this.selectedUser}`, options)
       .subscribe(res => {
           const newAnswer = document.createElement("li");
           newAnswer.textContent = res as string;
@@ -47,7 +49,7 @@ export class UserComponent implements OnInit {
   }
 
   getProblems(): void {
-    this._http.get('http://localhost:5024/cpptester/problems')
+    this._http.get(`${this._serverAddress}/cpptester/problems`)
       .subscribe((res) => {
         this.problems = res as string[];
       });
@@ -56,7 +58,7 @@ export class UserComponent implements OnInit {
   onSubmit() {
     const fileData = new FormData();
     fileData.append("file", this.selectedFile, this.selectedFile.name);
-    this._http.post(`http://localhost:5024/cpptester/source/${this.problemName}/${this.selectedUser}`, fileData)
+    this._http.post(`${this._serverAddress}/cpptester/source/${this.problemName}/${this.selectedUser}`, fileData)
       .subscribe((res) => {
 
           const newAnswer = document.createElement("li");
@@ -72,7 +74,7 @@ export class UserComponent implements OnInit {
   }
 
   getProblem(problem: string) {
-    this._http.get(`http://localhost:5024/cpptester/problems/${problem}`)
+    this._http.get(`${this._serverAddress}/cpptester/problems/${problem}`)
       .subscribe((res) => {
         this.problemName = problem;
         this.description = (res as string[])[0];
