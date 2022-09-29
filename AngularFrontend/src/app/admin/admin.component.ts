@@ -51,13 +51,15 @@ export class AdminComponent implements OnInit, OnDestroy {
           console.log(data);
           this.token = data as string;
         },
-          error => window.alert('Credentials are not correct')
+          error => {
+            window.alert("Credentials are not correct");
+          }
     );
   }
 
   public submitFile(file: File| any, url: string): void {
     const fileData = new FormData();
-    fileData.append('file', file, this.token as string);
+    fileData.append("file", file, this.token as string);
     this._http.post(url, fileData)
       .subscribe((res) => {
         const newAnswer = document.createElement("li");

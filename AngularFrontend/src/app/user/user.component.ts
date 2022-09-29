@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {HttpClient, HttpHeaders} from "@angular/common/http";
 
 @Component({
@@ -9,11 +9,11 @@ import {HttpClient, HttpHeaders} from "@angular/common/http";
 export class UserComponent implements OnInit {
 
   selectedFile: File | any = null;
-  problems: string[] | null = null ;
+  problems: string[] | null = null;
   problemName: string;
-  inputExample : string | null = null;
-  outputExample : string | null = null;
-  description : string | null = null;
+  inputExample: string | null = null;
+  outputExample: string | null = null;
+  description: string | null = null;
   selectedUser: string = "";
 
   constructor(private _http: HttpClient) {
@@ -21,7 +21,8 @@ export class UserComponent implements OnInit {
     this.getProblems();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  }
 
   selectSourceFile(event: any): void {
     this.selectedFile = event.target.files[0];
@@ -33,19 +34,19 @@ export class UserComponent implements OnInit {
     }
     this._http.get<string>(`http://localhost:5024/cpptester/run/${this.problemName}/${this.selectedUser}`, options)
       .subscribe(res => {
-        const newAnswer = document.createElement("li");
-        newAnswer.textContent = res as string;
-        newAnswer.className += " list-group-item";
+          const newAnswer = document.createElement("li");
+          newAnswer.textContent = res as string;
+          newAnswer.className += " list-group-item";
 
-        const statusList = document.getElementById("serverResponse");
-        statusList?.appendChild(newAnswer);
-      },
+          const statusList = document.getElementById("serverResponse");
+          statusList?.appendChild(newAnswer);
+        },
         error => {
-            window.alert(error);
+          window.alert("Username is not valid");
         });
   }
 
-  getProblems(): void{
+  getProblems(): void {
     this._http.get('http://localhost:5024/cpptester/problems')
       .subscribe((res) => {
         this.problems = res as string[];
@@ -54,17 +55,20 @@ export class UserComponent implements OnInit {
 
   onSubmit() {
     const fileData = new FormData();
-    fileData.append('file', this.selectedFile, this.selectedFile.name);
+    fileData.append("file", this.selectedFile, this.selectedFile.name);
     this._http.post(`http://localhost:5024/cpptester/source/${this.problemName}/${this.selectedUser}`, fileData)
       .subscribe((res) => {
 
-        const newAnswer = document.createElement("li");
-        newAnswer.textContent = res as string;
-        newAnswer.className += " list-group-item";
+          const newAnswer = document.createElement("li");
+          newAnswer.textContent = res as string;
+          newAnswer.className += " list-group-item";
 
-        const statusList = document.getElementById("serverResponse");
-        statusList?.appendChild(newAnswer);
-      });
+          const statusList = document.getElementById("serverResponse");
+          statusList?.appendChild(newAnswer);
+        },
+        error => {
+          window.alert("Username is not valid");
+        });
   }
 
   getProblem(problem: string) {

@@ -1,1 +1,0 @@
-Se citesc din fisier doua numere intregi. Sa se afiseze ambele numere pe rand, pe linii distincte si apoi suma lor.

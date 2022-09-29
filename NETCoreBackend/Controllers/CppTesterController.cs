@@ -49,7 +49,7 @@ namespace NETCoreBackend.Controllers
                     return BadRequest(JsonSerializer.Serialize("Credentials are not correct"));
                 }
             }
-            return Ok("Already logged in");
+            return Ok(JsonSerializer.Serialize("Already logged in"));
         }
 
         [HttpDelete("credentials/{token}")]
@@ -70,14 +70,17 @@ namespace NETCoreBackend.Controllers
         [HttpGet("problems")]
         public IActionResult GetProblems()
         {
-            var directoryNames = extractProblemNames(Directory.EnumerateDirectories(_configurationPaths["UploadPath"]));
+            var directoryNames = ExtractProblemNames(Directory.EnumerateDirectories(_configurationPaths["UploadPath"]));
             return Ok(JsonSerializer.Serialize(directoryNames));
         }
 
         [HttpPost("source/{id}/{username}")]
         public IActionResult PostSource(IFormFile file, [FromRoute] string id, [FromRoute] string username)
         {
-
+            if(!UsernameChecks(username))
+            {
+                return BadRequest(JsonSerializer.Serialize("Useranme is not valid"));
+            }
             string cppSourceName = "source.cpp";
             string uploadFolder = Path.Combine(_configurationPaths["UploadPath"], id);
             string userPath = Path.Combine(uploadFolder, username);
@@ -162,11 +165,20 @@ namespace NETCoreBackend.Controllers
         [HttpGet("run/{id}/{username}")]
         public IActionResult GetRun([FromRoute] string id, [FromRoute] string username)
         {
-            return runCpp(id, username);
+            if (!UsernameChecks(username))
+            {
+                return BadRequest(JsonSerializer.Serialize("Useranme is not valid"));
+            }
+            return RunCpp(id, username);
+        }
+
+        private bool UsernameChecks(string username)
+        {
+            return Regex.Match(username, @"^[A-Za-z-]+$").Success;
         }
 
         [HttpGet("problems/{problemName}")]
-        public IActionResult getProblemById([FromRoute] string problemName)
+        public IActionResult GetProblemById([FromRoute] string problemName)
         {
             string directoryName = Path.Combine(_configurationPaths["UploadPath"], problemName);
             string input = System.IO.File.ReadAllText(Path.Combine(directoryName, "input1.txt"));
@@ -175,9 +187,9 @@ namespace NETCoreBackend.Controllers
             return Ok(new string[] { description, input, output });
         }
 
-        private IActionResult runCpp(string id, string username) 
+        private IActionResult RunCpp(string id, string username) 
         {
-            Process process = processStartup();
+            Process process = ProcessStartup();
             string runPath = Path.Combine(_configurationPaths["UploadPath"], id, username);
             string problemPath = Path.Combine(_configurationPaths["UploadPath"], id);
             int total = 0, correct = 0;
@@ -208,7 +220,7 @@ namespace NETCoreBackend.Controllers
             {
                 string computedOutputFile = string.Format("source_output{0}.txt", i);
                 string actualOutputFile = string.Format("../output{0}.txt", i);
-                if (compareOutput(runPath, computedOutputFile, actualOutputFile))
+                if (CompareOutput(runPath, computedOutputFile, actualOutputFile))
                 {
                     Console.WriteLine(String.Format("Files {0} and {1} are identical", computedOutputFile, actualOutputFile));
                     correct++;
@@ -221,7 +233,7 @@ namespace NETCoreBackend.Controllers
             return Ok(JsonSerializer.Serialize("Score is " + correct + "/" + total));
         }
 
-        private Process processStartup()
+        private Process ProcessStartup()
         {
             var processInfo = new ProcessStartInfo
             {
@@ -246,7 +258,7 @@ namespace NETCoreBackend.Controllers
             return process;
         }
         
-        private bool compareOutput(string runPath,string computedOutput, string actualOutput)
+        private bool CompareOutput(string runPath,string computedOutput, string actualOutput)
         {
             string computedOutputFilePath = Path.Combine(runPath, computedOutput);
             string actualOutputFilePath = Path.Combine(runPath, actualOutput);
@@ -254,7 +266,7 @@ namespace NETCoreBackend.Controllers
             return CheckSum.SHA256CheckSum(computedOutputFilePath) == CheckSum.SHA256CheckSum(actualOutputFilePath);
         }
 
-        private IEnumerable<string> extractProblemNames(IEnumerable<string> problems)
+        private IEnumerable<string> ExtractProblemNames(IEnumerable<string> problems)
         {
             return problems.Select(problem => Path.GetFileName(problem)).ToArray();
         }
